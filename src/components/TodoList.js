@@ -1,30 +1,32 @@
-import React from "react";
-import { connect } from "react-redux";
-import TodoItem from "./TodoItem";
+import React from 'react';
+import { compose } from 'redux';
+import { connect } from 'react-redux';
+import { withRouter } from 'react-router-dom';
+import TodoItem from './TodoItem';
+import { getVisibleTodos } from '../reducers';
 
 const TodoList = ({ todos }) => (
   <ul>
     {todos.map(todo => (
-      <TodoItem completed={todo.completed} id={todo.id} key={todo.id}>
+      <TodoItem
+        completed={todo.completed}
+        id={todo.id}
+        key={todo.id}
+      >
         {todo.text}
       </TodoItem>
     ))}
   </ul>
 );
 
-const getVisibleTodos = (todos, visibilityFilter) => {
-  switch (visibilityFilter) {
-    case "all":
-      return todos;
-    case "active":
-      return todos.filter(t => !t.completed);
-    case "completed":
-      return todos.filter(t => t.completed);
-  }
-};
-
-const mapStateToProps = ({ todos, visibilityFilter }) => ({
-  todos: getVisibleTodos(todos, visibilityFilter)
+const mapStateToProps = (state, { match }) => ({
+  todos: getVisibleTodos(
+    state,
+    match.params.filter || 'all'
+  )
 });
 
-export default connect(mapStateToProps)(TodoList);
+export default compose(
+  withRouter,
+  connect(mapStateToProps)
+)(TodoList);

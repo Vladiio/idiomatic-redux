@@ -1,21 +1,24 @@
-import React from "react";
-import { connect } from "react-redux";
-import { toggleTodo } from "../actions/todos.actions";
+import React from 'react';
+import { connect } from 'react-redux';
+import { toggleTodo } from '../actions/todos.actions';
 
-const TodoItem = ({ children, onTodoClick, completed }) => (
+const TodoItem = ({
+  children,
+  onTodoClick,
+  completed,
+  id
+}) => (
   <li
-    style={{ textDecoration: completed ? "line-through" : "none" }}
-    onClick={onTodoClick}
+    style={{
+      textDecoration: completed ? 'line-through' : 'none'
+    }}
+    onClick={() => onTodoClick(id)}
   >
     {children}
   </li>
 );
 
-const mapDispatchToProps = (dispatch, ownProps) => ({
-  onTodoClick: () => dispatch(toggleTodo(ownProps.id))
-});
-
 export default connect(
   null,
-  mapDispatchToProps
+  { onTodoClick: toggleTodo }
 )(TodoItem);

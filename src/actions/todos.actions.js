@@ -1,9 +1,13 @@
-import { ADD_TODO, TOGGLE_TODO } from "constants/actionTypes";
+import { v4 } from 'node-uuid';
+import {
+  ADD_TODO,
+  TOGGLE_TODO
+} from 'constants/actionTypes';
 
-let nextTodoId = 0;
+// let nextTodoId = 0;
 export const addTodo = text => ({
   type: ADD_TODO,
-  id: nextTodoId++,
+  id: v4(),
   text
 });
 

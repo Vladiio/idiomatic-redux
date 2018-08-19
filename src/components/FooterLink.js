@@ -1,29 +1,15 @@
-import React from "react";
-import { connect } from "react-redux";
-import { setVisibilityFilter } from "actions/visibilityFilter.actions";
+import React from 'react';
+import { NavLink } from 'react-router-dom';
 
-const FooterLink = ({ active, filter, children, onClick }) =>
-  active ? (
-    <span>{children}</span>
-  ) : (
-    <a
-      href="#"
-      onClick={e => {
-        e.preventDefault();
-        onClick(filter);
-      }}
-    >
-      {children}
-    </a>
-  );
 
-const mapStateToProps = (state, ownProps) => ({
-  active: state.visibilityFilter === ownProps.filter
-});
+const FooterLink = ({ filter, children }) => (
+  <NavLink
+    to={filter === 'all' ? '' : '/' + filter}
+    exact
+    activeStyle={{ textDecoration: 'none', color: 'black' }}
+  >
+    {children}
+  </NavLink>
+);
 
-export default connect(
-  mapStateToProps,
-  {
-    onClick: setVisibilityFilter
-  }
-)(FooterLink);
+export default FooterLink;
