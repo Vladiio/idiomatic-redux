@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import TodoItem from './TodoItem';
 import { getVisibleTodos } from '../reducers';
+import { fetchTodos } from '../api';
 
 const TodoList = ({ todos }) => (
   <ul>
@@ -18,15 +19,34 @@ const TodoList = ({ todos }) => (
     ))}
   </ul>
 );
+class VisibleTodoList extends React.Component {
+  componentDidMount() {
+    fetchTodos(this.props.filter).then(todos =>
+      console.log(todos)
+    );
+  }
 
-const mapStateToProps = (state, { match }) => ({
-  todos: getVisibleTodos(
-    state,
-    match.params.filter || 'all'
-  )
-});
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.filter !== this.props.filter) {
+      fetchTodos(this.props.filter).then(todos =>
+        console.log(todos)
+      );
+    }
+  }
+  render() {
+    return <TodoList {...this.props} />;
+  }
+}
+
+const mapStateToProps = (state, { match }) => {
+  const filter = match.params.filter || 'all';
+  return {
+    todos: getVisibleTodos(state, filter),
+    filter
+  };
+};
 
 export default compose(
   withRouter,
   connect(mapStateToProps)
-)(TodoList);
+)(VisibleTodoList);
