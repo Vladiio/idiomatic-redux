@@ -1,8 +1,6 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { toggleTodo } from '../actions/todos.actions';
 
-const TodoItem = ({
+export default ({
   children,
   onTodoClick,
   completed,
@@ -17,8 +15,3 @@ const TodoItem = ({
     {children}
   </li>
 );
-
-export default connect(
-  null,
-  { onTodoClick: toggleTodo }
-)(TodoItem);

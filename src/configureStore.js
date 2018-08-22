@@ -1,5 +1,5 @@
 import { createStore } from 'redux';
-// import { throttle } from 'lodash';
+// import1 { throttle } from 'lodash';
 import rootReducer from 'reducers';
 // import { loadState, saveState } from './localStorage';
 
@@ -27,6 +27,16 @@ const addLogginToDispatch = store => {
   };
 };
 
+const addPromiseSupportToDispatch = store => {
+  const rawDispatch = store.dispatch;
+  return action => {
+    if (typeof action.then === 'function') {
+      return action.then(rawDispatch);
+    }
+    return rawDispatch(action);
+  };
+};
+
 export default () => {
   // const persistedState = loadState();
 
@@ -39,6 +49,8 @@ export default () => {
   if (process.env.NODE_ENV !== 'production') {
     store.dispatch = addLogginToDispatch(store);
   }
+
+  store.dispatch = addPromiseSupportToDispatch(store);
 
   // store.subscribe(
   //   throttle(() =>
