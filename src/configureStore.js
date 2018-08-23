@@ -1,56 +1,66 @@
-import { createStore } from 'redux';
+import {
+  createStore,
+  applyMiddleware,
+  compose
+} from 'redux';
 // import1 { throttle } from 'lodash';
 import rootReducer from 'reducers';
+import { createLogger } from 'redux-logger';
+import promise from 'redux-promise';
 // import { loadState, saveState } from './localStorage';
 
-const addLogginToDispatch = store => {
-  const rawDispatch = store.dispatch;
-  if (!console.group) {
-    return rawDispatch;
-  }
-  return action => {
-    console.group(action.type);
-    console.log(
-      '%c prev state',
-      'color: gray',
-      store.getState()
-    );
-    console.log('%c action ', 'color: blue', action);
-    const returnValue = rawDispatch(action);
-    console.log(
-      '%c next state ',
-      'color: green',
-      store.getState()
-    );
-    console.groupEnd(action.type);
-    return returnValue;
-  };
-};
+// const logger = store => next => action => {
+//   if (!console.group) {
+//     return next;
+//   }
+//   console.group(action.type);
+//   console.log(
+//     '%c prev state',
+//     'color: gray',
+//     store.getState()
+//   );
+//   console.log('%c action ', 'color: blue', action);
+//   const returnValue = next(action);
+//   console.log(
+//     '%c next state ',
+//     'color: green',
+//     store.getState()
+//   );
+//   console.groupEnd(action.type);
+//   return returnValue;
+// };
 
-const addPromiseSupportToDispatch = store => {
-  const rawDispatch = store.dispatch;
-  return action => {
-    if (typeof action.then === 'function') {
-      return action.then(rawDispatch);
-    }
-    return rawDispatch(action);
-  };
-};
+// const promiseMiddleware = store => next => action => {
+//   if (typeof action.then === 'function') {
+//     return action.then(next);
+//   }
+//   return next(action);
+// };
+
+// const wrapDispatchWithMiddlewares = (store, middlewares) =>
+//   middlewares
+//     .slice()
+//     .reverse()
+//     .forEach(middleware => {
+//       store.dispatch = middleware(store)(store.dispatch);
+//     });
 
 export default () => {
   // const persistedState = loadState();
-
-  const store = createStore(
-    rootReducer,
-    // persistedState,
-    window.__REDUX_DEVTOOLS_EXTENSION__ &&
-      window.__REDUX_DEVTOOLS_EXTENSION__()
-  );
+  const logger = createLogger();
+  const middlewares = [promise];
   if (process.env.NODE_ENV !== 'production') {
-    store.dispatch = addLogginToDispatch(store);
+    middlewares.push(logger);
   }
 
-  store.dispatch = addPromiseSupportToDispatch(store);
+  const composeEnhencers =
+    window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
+  return createStore(
+    rootReducer,
+    // persistedState,
+    composeEnhencers(applyMiddleware(...middlewares))
+  );
 
   // store.subscribe(
   //   throttle(() =>
@@ -59,5 +69,4 @@ export default () => {
   //   1000
   // );
 
-  return store;
 };
