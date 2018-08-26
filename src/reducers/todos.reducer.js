@@ -1,55 +1,30 @@
 import { combineReducers } from 'redux';
-import {
-  ADD_TODO,
-  TOGGLE_TODO
-} from 'constants/actionTypes';
-import todo from './todo';
+// import todo from './todo';
+import byId, * as fromById from './byId';
+import createList, * as fromCreateList from './createList';
 
-const byId = (state = {}, action) => {
-  switch (action.type) {
-    case ADD_TODO:
-    case TOGGLE_TODO:
-      return {
-        ...state,
-        [action.id]: todo(state[action.id], action)
-      };
-    default:
-      return state;
-  }
-};
-
-const ids = (state = [], action) => {
-  switch (action.type) {
-    case ADD_TODO:
-      return [...state, action.id];
-    default:
-      return state;
-  }
-};
+const listByFilter = combineReducers({
+  all: createList('all'),
+  active: createList('active'),
+  completed: createList('completed')
+});
 
 export default combineReducers({
   byId,
-  ids
+  listByFilter
 });
 
-const getAllTodos = state =>
-  state.ids.map(id => state.byId[id]);
-
-export const getVisibleTodos = (
-  state,
-  visibilityFilter
-) => {
-  const allTodos = getAllTodos(state);
-  switch (visibilityFilter) {
-    case 'all':
-      return allTodos;
-    case 'active':
-      return allTodos.filter(t => !t.completed);
-    case 'completed':
-      return allTodos.filter(t => t.completed);
-    default:
-      throw new Error(
-        'Unknown visibility filter: ' + visibilityFilter
-      );
-  }
+export const getVisibleTodos = (state, filter) => {
+  const ids = fromCreateList.getIds(
+    state.listByFilter[filter]
+  );
+  return ids.map(id => fromById.getTodo(state.byId, id));
 };
+
+export const getIsFetching = (state, filter) =>
+  fromCreateList.getIsFetching(state.listByFilter[filter]);
+
+export const getErrorMessage = (state, filter) =>
+  fromCreateList.getErrorMessage(
+    state.listByFilter[filter]
+  );

@@ -7,6 +7,7 @@ import {
 import rootReducer from 'reducers';
 import { createLogger } from 'redux-logger';
 import promise from 'redux-promise';
+import thunk from 'redux-thunk';
 // import { loadState, saveState } from './localStorage';
 
 // const logger = store => next => action => {
@@ -45,10 +46,16 @@ import promise from 'redux-promise';
 //       store.dispatch = middleware(store)(store.dispatch);
 //     });
 
+// const thunk = store => next => action => {
+//   typeof action === 'function'
+//     ? action(store.dispatch, store.getState)
+//     : next(action);
+// };
+
 export default () => {
   // const persistedState = loadState();
   const logger = createLogger();
-  const middlewares = [promise];
+  const middlewares = [promise, thunk];
   if (process.env.NODE_ENV !== 'production') {
     middlewares.push(logger);
   }
@@ -68,5 +75,4 @@ export default () => {
   //   ),
   //   1000
   // );
-
 };
